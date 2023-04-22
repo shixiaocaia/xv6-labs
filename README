@@ -1,9 +1,7 @@
 - 熟悉环境配置
 
-- WSL git配置, Git需要重新配置 [参考链接](https://zhuanlan.zhihu.com/p/252505037)
+- WSL git配置, Git需要重新配置[参考链接](https://zhuanlan.zhihu.com/p/252505037)
 
-- 版本管理
+- 版本管理：在本地修改test分支，再合并util分支，再与远端版本合并，最后同步
 
-    - 在本地修改，合并推到远端
-
-    - test
+- gdb的使用
