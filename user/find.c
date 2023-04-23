@@ -9,6 +9,7 @@ void find(char *path, char *target) {
 	int fd;
 	struct dirent de;
 	struct stat st;
+	//printf("path: %s\n", path);
 
 	if((fd = open(path, 0)) < 0){
 		fprintf(2, "find: cannot open %s\n", path);
@@ -16,53 +17,54 @@ void find(char *path, char *target) {
 	}
 
 	if(fstat(fd, &st) < 0){
-		fprintf(2, "find: cannot stat %s\n", path);
-		close(fd);
+		fprintf(2, "find: cannot fstat %s\n", path);
+		close(fd); //及时关闭fd
 		return;
 	}
 
-	switch(st.type){
-	case T_FILE:
-		// 如果文件名结尾匹配 `/target`，则视为匹配
-		if(strcmp(path+strlen(path)-strlen(target), target) == 0) {
-			printf("%s\n", path);
+	while(read(fd, &de, sizeof(de)) == sizeof(de)){
+		if(de.inum == 0){
+			continue;
 		}
-		break;
-	case T_DIR:
-		if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-			printf("find: path too long\n");
-			break;
-		}
-		strcpy(buf, path);
-		p = buf+strlen(buf);
+		//printf("buf: %s, | path: %s, | de.name: %s\n",buf, path, de.name);
+		strcpy(buf, path); //覆盖
+		p = buf + strlen(buf); //移动到buf末尾
 		*p++ = '/';
-		while(read(fd, &de, sizeof(de)) == sizeof(de)){
-			if(de.inum == 0)
-				continue;
-			memmove(p, de.name, DIRSIZ);
-			p[DIRSIZ] = 0;
-			if(stat(buf, &st) < 0){
-				printf("find: cannot stat %s\n", buf);
-				continue;
-			}
-			// 不要进入 `.` 和 `..`
-			if(strcmp(buf+strlen(buf)-2, "/.") != 0 && strcmp(buf+strlen(buf)-3, "/..") != 0) {
-				find(buf, target); // 递归查找
-			}
+		memmove(p, de.name, DIRSIZ); // 覆盖
+		p[DIRSIZ] = 0;
+
+		if(stat(buf, &st) < 0){
+			fprintf(2, "find: cannot stat %s\n", buf);
 		}
-		break;
+
+		switch(st.type){
+			case T_FILE:
+				if(strcmp(target, de.name) == 0){
+					printf("%s\n", buf);
+				}
+				break;
+
+			case T_DIR:
+				//printf("is dir %s\n", de.name);
+				if((strcmp(de.name, ".") != 0) && strcmp(de.name, "..") != 0){
+					find(buf, target);
+				}
+		}
 	}
 	close(fd);
+	return;
 }
 
 int main(int argc, char *argv[])
 {
-	if(argc < 3){
-		exit(0);
+	if(argc != 3){
+		fprintf(2, "please enter correct argu\n");
+		exit(1);  //error exit
 	}
-	char target[512];
-	target[0] = '/'; // 为查找的文件名添加 / 在开头
-	strcpy(target+1, argv[2]);
-	find(argv[1], target);
+
+	char *pathname = argv[1];
+	char *filename = argv[2];
+
+	find(pathname, filename);
 	exit(0);
 }
