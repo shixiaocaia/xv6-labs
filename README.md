@@ -3,13 +3,16 @@ Lab Util
 
 ## C
 
-- **, *,指针
 - static静态变量的定义和使用
-- int argc 和char *argc[]
-  - argc 是参数的个数
-  - argc[0]是exe文件名，比如test.exe
+- `int argc` 和`char *argc[]`
+  - `argc` 是参数的个数
+  - `argc[0]`是exe文件名，比如`test.exe`
   - 后面几个是以空格为间隔传入的参数名
-
+- `echo > a` 会生成文件a，如果已有文件a，会删除后重建
+  - `echo hello > a`输出hello到重建的a文件当中
+  - `cat < a` 显示文件内容
+- `open`函数会返回当前进程未使用的最小文件描述符序号
+- 
 ## Sleep
 
 
@@ -29,8 +32,8 @@ Lab Util
 
 如果需要进行双向通信，因为一个管道是单向的，需要两个管道。
 
-https://www.cnblogs.com/MrListening/p/5858358.html
 
+> [参考:](https://www.cnblogs.com/MrListening/p/5858358.html)
 > - 这里及时关闭一端管道，变成管道是只写只读，是为了节省资源，fd是有限的
 > - close(fd)出于资源和安全
 
@@ -60,3 +63,7 @@ https://www.cnblogs.com/MrListening/p/5858358.html
 
 
 - ls 可以看到整个路径包含了`.`,`..`,这两部分不会递归进入，de移动到下一个文件。
+
+
+## Xrags
+
